@@ -1,18 +1,4 @@
-:root {
-    --background-light: linear-gradient(to bottom right, #b19cd9, #87cefa);
-    --background-dark: linear-gradient(to bottom right, #2c3e50, #34495e);
-    --container-bg-light: #fff;
-    --container-bg-dark: #333;
-    --text-color-light: #000;
-    --text-color-dark: #fff;
-    --button-bg-light: #87cefa;
-    --button-bg-dark: #555;
-    --button-hover-bg-light: #6cb8ee;
-    --button-hover-bg-dark: #666;
-    --sun-color: #FFD700; /* Yellow color for sun */
-    --moon-color: #fff; /* White color for moon */
-}
-
+/* Body styles */
 body {
     margin: 0;
     padding: 0;
@@ -20,33 +6,30 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background: var(--background-light);
+    background: linear-gradient(to bottom right, #b19cd9, #87cefa); /* Default background */
     transition: background 1s;
-    font-family: Arial, sans-serif; /* Set default font family */
-    color: var(--text-color-light); /* Set default text color */
+    font-family: Arial, sans-serif;
+    color: #000;
 }
 
 body.dark-mode {
-    background: var(--background-dark);
-    color: var(--text-color-dark);
+    background: linear-gradient(to bottom right, #2c3e50, #34495e); /* Dark mode background */
+    color: #fff;
 }
 
+/* Login container styles */
 .login-container {
     width: 400px;
-    background: var(--container-bg-light);
+    background: #fff;
     padding: 40px;
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     text-align: center;
-    transition: background 1s, color 1s;
     position: relative;
     overflow: hidden;
 }
 
-body.dark-mode .login-container {
-    background: var(--container-bg-dark);
-}
-
+/* Form styles */
 form {
     display: flex;
     flex-direction: column;
@@ -58,30 +41,24 @@ input[type="password"] {
     padding: 15px;
     border: 1px solid #ccc;
     border-radius: 3px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Set font for input fields */
 }
 
-button {
-    padding: 15px 20px;
-    background: var(--button-bg-light);
-    color: #fff;
-    border: none;
-    border-radius: 3px;
+/* Password toggle button styles */
+.password-container {
+    position: relative;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
     cursor: pointer;
-    transition: background 0.3s;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Set font for buttons */
 }
 
-button:hover {
-    background: var(--button-hover-bg-light);
-}
-
-body.dark-mode button {
-    background: var(--button-bg-dark);
-}
-
-body.dark-mode button:hover {
-    background: var(--button-hover-bg-dark);
+.password-toggle i {
+    color: #888;
+    font-size: 18px;
 }
 
 /* Toggle switch styles */
@@ -137,10 +114,9 @@ input:checked + .slider:before {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 16px; /* Adjusted font size */
-    transition: opacity 0.4s;
-    width: 20px; /* Ensures icons fit within the circle */
-    height: 20px; /* Ensures icons fit within the circle */
+    font-size: 16px;
+    width: 20px;
+    height: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -149,13 +125,11 @@ input:checked + .slider:before {
 .sun-icon {
     left: 6px;
     opacity: 1;
-    color: var(--sun-color); /* Yellow color for sun */
 }
 
 .moon-icon {
     right: 6px;
     opacity: 0;
-    color: var(--moon-color); /* White color for moon */
 }
 
 input:checked + .slider .sun-icon {
@@ -166,86 +140,6 @@ input:checked + .slider .moon-icon {
     opacity: 1;
 }
 
-/* Password toggle */
-.password-toggle {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-}
-
-.password-toggle i {
-    color: #888;
-    font-size: 18px;
-}
-
-.password-toggle:hover i {
-    color: #333;
-}
-
-/* Star animation */
-@keyframes star {
-    from {
-        transform: translateY(-10px);
-        opacity: 1;
-    }
-    to {
-        transform: translateY(10px);
-        opacity: 0;
-    }
-}
-
-.star {
-    position: absolute;
-    width: 2px;
-    height: 2px;
-    background: #fff;
-    border-radius: 50%;
-    animation: star 2s infinite ease-in-out;
-}
-
-.star-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    pointer-events: none;
-    display: block;
-}
-
-.star:nth-child(1) {
-    top: 20%;
-    left: 25%;
-    animation-delay: 0s;
-}
-
-.star:nth-child(2) {
-    top: 40%;
-    left: 75%;
-    animation-delay: 0.2s;
-}
-
-.star:nth-child(3) {
-    top: 60%;
-    left: 50%;
-    animation-delay: 0.4s;
-}
-
-.star:nth-child(4) {
-    top: 80%;
-    left: 20%;
-    animation-delay: 0.6s;
-}
-
-.star:nth-child(5) {
-    top: 50%;
-    left: 30%;
-    animation-delay: 0.8s;
-}
-
 /* Rain effect */
 .rain {
     position: fixed;
@@ -254,10 +148,10 @@ input:checked + .slider .moon-icon {
     width: 100%;
     height: 100%;
     pointer-events: none;
-    z-index: -1; /* Ensure it's behind other content */
-    background-image: url('https://media.giphy.com/media/26tjZwNKlrOEIvG7S/giphy.gif'); /* Rain image URL */
+    z-index: -1;
     opacity: 0; /* Initially hidden */
     transition: opacity 1s ease-in-out; /* Smooth transition */
+    background-image: url('https://media.giphy.com/media/26tjZwNKlrOEIvG7S/giphy.gif'); /* Rain image URL */
 }
 
 body.dark-mode .rain.dark {
@@ -265,6 +159,3 @@ body.dark-mode .rain.dark {
 }
 
 body:not(.dark-mode) .rain.light {
-    opacity: 1; /* Show rain in light mode */
-}
-``
