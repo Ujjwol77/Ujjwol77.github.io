@@ -1,51 +1,25 @@
-// Function to toggle dark mode and rain effect
+// Function to toggle dark mode
 document.getElementById('mode-toggle').addEventListener('change', function() {
-    document.body.classList.toggle('dark-mode'); // Toggle dark mode class on body
-    const rainContainer = document.querySelector('.rain'); // Select the rain effect container
-
-    // Toggle dark and light classes on the rain effect container based on the mode
-    if (document.body.classList.contains('dark-mode')) {
-        rainContainer.classList.remove('light');
-        rainContainer.classList.add('dark');
-    } else {
-        rainContainer.classList.remove('dark');
-        rainContainer.classList.add('light');
-    }
+    document.body.classList.toggle('dark-mode');
+    document.querySelector('.star-container').classList.toggle('show-stars');
 });
 
-// Function to toggle password visibility
-function togglePasswordVisibility() {
-    const passwordInput = document.getElementById('password');
-    const passwordToggle = document.querySelector('.password-toggle');
-
-    if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
-        passwordToggle.innerHTML = '<i class="fas fa-eye-slash"></i>';
-    } else {
-        passwordInput.type = 'password';
-        passwordToggle.innerHTML = '<i class="fas fa-eye"></i>';
-    }
+// Function to display stars on page load
+window.onload = function() {
+    document.querySelector('.star-container').classList.add('show-stars');
 }
 
 // Function to handle form submission
 document.getElementById('login-form').addEventListener('submit', function(event) {
     event.preventDefault(); // Prevent default form submission
 
-    // Get form inputs
-    let username = document.getElementById('username').value.trim();
-    let password = document.getElementById('password').value.trim();
+    let username = document.getElementById('username').value;
+    let password = document.getElementById('password').value;
 
-    // Validate inputs
-    if (username === '' || password === '') {
-        alert('Please enter both username and password.');
-        return;
-    }
-
-    // Add your authentication logic here (replace with actual logic)
+    // Add your authentication logic here
     if (username === 'admin' && password === 'password') {
         alert('Login successful!');
-        // Redirect to the new page after successful login
-        window.location.href = "new-page.html";
+        // Redirect to admin panel page
     } else {
         alert('Invalid username or password. Please try again.');
     }
