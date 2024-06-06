@@ -19,8 +19,14 @@ body.dark-mode {
 }
 
 /* Star animation */
-.star-container.show-stars .star {
-    opacity: 1; /* Show stars when dark mode is enabled */
+.star-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
 }
 
 .star {
@@ -30,6 +36,22 @@ body.dark-mode {
     background: #fff;
     border-radius: 50%;
     opacity: 0; /* Hide stars initially */
+    animation: star-fall 8s linear infinite; /* Define animation */
 }
 
-/* Add more styles as needed */
+/* Define animation keyframes */
+@keyframes star-fall {
+    0% {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(100vh);
+        opacity: 1;
+    }
+}
+
+/* Adjust animation speed for dark mode */
+body.dark-mode .star {
+    animation-duration: 12s; /* Slow down animation for dark mode */
+}
