@@ -1,23 +1,17 @@
-// Function to toggle dark mode and show stars
-function toggleDarkMode() {
-    document.body.classList.toggle('dark-mode');
-    document.querySelector('.star-container').classList.toggle('show-stars');
-}
+// Function to toggle dark mode and rain effect
+document.getElementById('mode-toggle').addEventListener('change', function() {
+    document.body.classList.toggle('dark-mode'); // Toggle dark mode class on body
+    const rainContainer = document.querySelector('.rain'); // Select the rain effect container
 
-// Function to generate stars
-function generateStars() {
-    const starContainer = document.querySelector('.star-container');
-    const numberOfStars = 50; // Change this number to adjust the quantity of stars
-
-    for (let i = 0; i < numberOfStars; i++) {
-        const star = document.createElement('div');
-        star.classList.add('star');
-        star.style.top = `${Math.random() * 100}%`;
-        star.style.left = `${Math.random() * 100}%`;
-        star.style.animationDelay = `${Math.random() * 5}s`;
-        starContainer.appendChild(star);
+    // Toggle dark and light classes on the rain effect container based on the mode
+    if (document.body.classList.contains('dark-mode')) {
+        rainContainer.classList.remove('light');
+        rainContainer.classList.add('dark');
+    } else {
+        rainContainer.classList.remove('dark');
+        rainContainer.classList.add('light');
     }
-}
+});
 
 // Function to toggle password visibility
 function togglePasswordVisibility() {
@@ -34,7 +28,7 @@ function togglePasswordVisibility() {
 }
 
 // Function to handle form submission
-function handleFormSubmission(event) {
+document.getElementById('login-form').addEventListener('submit', function(event) {
     event.preventDefault(); // Prevent default form submission
 
     // Get form inputs
@@ -50,19 +44,9 @@ function handleFormSubmission(event) {
     // Add your authentication logic here (replace with actual logic)
     if (username === 'admin' && password === 'password') {
         alert('Login successful!');
-        // Redirect to admin panel page or perform other actions
+        // Redirect to the new page after successful login
+        window.location.href = "new-page.html";
     } else {
         alert('Invalid username or password. Please try again.');
     }
-}
-
-window.location.href = "admin panel.html";
-
-// Event listeners
-document.getElementById('mode-toggle').addEventListener('change', toggleDarkMode);
-document.getElementById('login-form').addEventListener('submit', handleFormSubmission);
-document.getElementById('mode-toggle').addEventListener('change', function() {
-    document.body.classList.toggle('dark-mode');
-    document.querySelector('.rain').classList.toggle('dark');
-    document.querySelector('.rain').classList.toggle('light');
 });
