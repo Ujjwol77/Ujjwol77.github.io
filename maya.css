@@ -1,161 +1,35 @@
-/* Body styles */
+/* Fonts */
 body {
-    margin: 0;
-    padding: 0;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: linear-gradient(to bottom right, #b19cd9, #87cefa); /* Default background */
-    transition: background 1s;
     font-family: Arial, sans-serif;
-    color: #000;
 }
 
-body.dark-mode {
-    background: linear-gradient(to bottom right, #2c3e50, #34495e); /* Dark mode background */
-    color: #fff;
-}
-
-/* Login container styles */
-.login-container {
-    width: 400px;
-    background: #fff;
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-}
-
-/* Form styles */
-form {
-    display: flex;
-    flex-direction: column;
+h2 {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 input[type="text"],
-input[type="password"] {
-    margin: 10px 0;
-    padding: 15px;
-    border: 1px solid #ccc;
-    border-radius: 3px;
+input[type="password"],
+button {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Password toggle button styles */
-.password-container {
-    position: relative;
+/* Styles for dark mode */
+body.dark-mode {
+    filter: invert(1); /* Invert colors for dark mode */
 }
 
-.password-toggle {
+/* Star animation */
+.star-container.show-stars .star {
+    opacity: 1; /* Show stars when dark mode is enabled */
+}
+
+.star {
     position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-}
-
-.password-toggle i {
-    color: #888;
-    font-size: 18px;
-}
-
-/* Toggle switch styles */
-.switch {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    display: inline-block;
-    width: 60px;
-    height: 34px;
-}
-
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: .4s;
-    border-radius: 34px;
-}
-
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    transition: .4s;
+    width: 2px;
+    height: 2px;
+    background: #fff;
     border-radius: 50%;
+    opacity: 0; /* Hide stars initially */
 }
 
-input:checked + .slider {
-    background-color: #2196F3;
-}
-
-input:checked + .slider:before {
-    transform: translateX(26px);
-}
-
-/* Icons */
-.icon {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 16px;
-    width: 20px;
-    height: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.sun-icon {
-    left: 6px;
-    opacity: 1;
-}
-
-.moon-icon {
-    right: 6px;
-    opacity: 0;
-}
-
-input:checked + .slider .sun-icon {
-    opacity: 0;
-}
-
-input:checked + .slider .moon-icon {
-    opacity: 1;
-}
-
-/* Rain effect */
-.rain {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: -1;
-    opacity: 0; /* Initially hidden */
-    transition: opacity 1s ease-in-out; /* Smooth transition */
-    background-image: url('https://media.giphy.com/media/26tjZwNKlrOEIvG7S/giphy.gif'); /* Rain image URL */
-}
-
-body.dark-mode .rain.dark {
-    opacity: 1; /* Show rain in dark mode */
-}
-
-body:not(.dark-mode) .rain.light {
+/* Add more styles as needed */
