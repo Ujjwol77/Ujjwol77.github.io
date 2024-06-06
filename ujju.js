@@ -56,6 +56,8 @@ function handleFormSubmission(event) {
     }
 }
 
+window.location.href = "admin panel.html";
+
 // Event listeners
 document.getElementById('mode-toggle').addEventListener('change', toggleDarkMode);
 document.getElementById('login-form').addEventListener('submit', handleFormSubmission);
