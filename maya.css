@@ -22,6 +22,7 @@ body {
     align-items: center;
     background: var(--background-light);
     transition: background 1s;
+    font-family: Arial, sans-serif; /* Set default font family */
 }
 
 body.dark-mode {
@@ -38,6 +39,7 @@ body.dark-mode {
     transition: background 1s, color 1s;
     position: relative;
     overflow: hidden;
+    color: var(--text-color-light); /* Set default text color */
 }
 
 body.dark-mode .login-container {
@@ -50,11 +52,13 @@ form {
     flex-direction: column;
 }
 
-input {
+input[type="text"],
+input[type="password"] {
     margin: 10px 0;
     padding: 15px;
     border: 1px solid #ccc;
     border-radius: 3px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Set font for input fields */
 }
 
 button {
@@ -65,6 +69,7 @@ button {
     border-radius: 3px;
     cursor: pointer;
     transition: background 0.3s;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Set font for buttons */
 }
 
 button:hover {
@@ -127,6 +132,7 @@ input:checked + .slider:before {
     transform: translateX(26px);
 }
 
+/* Icons */
 .icon {
     position: absolute;
     top: 50%;
@@ -160,6 +166,24 @@ input:checked + .slider .moon-icon {
     opacity: 1;
 }
 
+/* Password toggle */
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+.password-toggle i {
+    color: #888;
+    font-size: 18px;
+}
+
+.password-toggle:hover i {
+    color: #333;
+}
+
 /* Star animation */
 @keyframes star {
     from {
@@ -181,7 +205,8 @@ input:checked + .slider .moon-icon {
     animation: star 2s infinite ease-in-out;
 }
 
-body.dark-mode .star-container {
+body.dark-mode .star-container,
+.star-container {
     display: block;
 }
 
@@ -193,48 +218,6 @@ body.dark-mode .star-container {
     height: 100%;
     overflow: hidden;
     pointer-events: none;
-    display: none;
-}
-
-.star:nth-child(1) {
-    top: 20%;
-    left: 25%;
-    animation-delay: 0s;
-}
-
-.star:nth-child(2) {
-    top: 40%;
-    left: 75%;
-    animation-delay: 0.2s;
-}
-
-.star:nth-child(3) {
-    top: 60%;
-    left: 50%;
-    animation-delay: 0.4s;
-}
-
-.star:nth-child(4) {
-    top: 80%;
-    left: 20%;
-    animation-delay: 0.6s;
-}
-
-.star:nth-child(5) {
-    top: 50%;
-    left: 30%;
-    animation-delay: 0.8s;
-}
-
-.star-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    pointer-events: none;
-    display: none;
 }
 
 .star:nth-child(1) {
@@ -291,54 +274,4 @@ body.dark-mode .star-container {
     animation-delay: 1.6s;
 }
 
-.star:nth-child(10) {
-    top: 60%;
-    left: 90%;
-    animation-delay: 1.8s;
-}
-
-.star:nth-child(11) {
-    top: 15%;
-    left: 20%;
-    animation-delay: 2s;
-}
-
-.star:nth-child(12) {
-    top: 45%;
-    left: 80%;
-    animation-delay: 2.2s;
-}
-
-/* Fonts */
-body {
-    font-family: Arial, sans-serif;
-}
-
-h2 {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-input[type="text"],
-
-
-.password-toggle {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-}
-
-.password-toggle i {
-    color: #888;
-    font-size: 18px;
-}
-
-.password-toggle:hover i {
-    color: #333;
-}
-
-input[type="password"],
-button {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
+.star:nth-child(10
