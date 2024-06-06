@@ -319,6 +319,25 @@ h2 {
 }
 
 input[type="text"],
+
+
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+.password-toggle i {
+    color: #888;
+    font-size: 18px;
+}
+
+.password-toggle:hover i {
+    color: #333;
+}
+
 input[type="password"],
 button {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
