@@ -1,16 +1,11 @@
-// Function to toggle dark mode
-document.getElementById('mode-toggle').addEventListener('change', function() {
+// Function to toggle dark mode and show stars
+function toggleDarkMode() {
     document.body.classList.toggle('dark-mode');
     document.querySelector('.star-container').classList.toggle('show-stars');
-});
-
-// Function to display stars on page load
-window.onload = function() {
-    generateStars();
 }
 
 // Function to generate stars
-function generateStars() { 
+function generateStars() {
     const starContainer = document.querySelector('.star-container');
     const numberOfStars = 50; // Change this number to adjust the quantity of stars
 
@@ -37,29 +32,9 @@ function togglePasswordVisibility() {
         passwordToggle.innerHTML = '<i class="fas fa-eye"></i>';
     }
 }
-// Function to generate stars
-function generateStars() {
-    const starContainer = document.querySelector('.star-container');
-    const numberOfStars = 50; // Change this number to adjust the quantity of stars
-
-    for (let i = 0; i < numberOfStars; i++) {
-        const star = document.createElement('div');
-        star.classList.add('star');
-        star.style.top = `${Math.random() * 100}%`;
-        star.style.left = `${Math.random() * 100}%`;
-        star.style.animationDelay = `${Math.random() * 5}s`;
-        starContainer.appendChild(star);
-    }
-}
-
-// Generate stars on page load
-window.onload = function() {
-    generateStars();
-}
-
 
 // Function to handle form submission
-document.getElementById('login-form').addEventListener('submit', function(event) {
+function handleFormSubmission(event) {
     event.preventDefault(); // Prevent default form submission
 
     // Get form inputs
@@ -79,4 +54,8 @@ document.getElementById('login-form').addEventListener('submit', function(event)
     } else {
         alert('Invalid username or password. Please try again.');
     }
-});
+}
+
+// Event listeners
+document.getElementById('mode-toggle').addEventListener('change', toggleDarkMode);
+document.getElementById('login-form').addEventListener('submit', handleFormSubmission);
