@@ -10,7 +10,7 @@ window.onload = function() {
 }
 
 // Function to generate stars
-function generateStars() {
+function generateStars() { 
     const starContainer = document.querySelector('.star-container');
     const numberOfStars = 50; // Change this number to adjust the quantity of stars
 
