@@ -23,10 +23,12 @@ body {
     background: var(--background-light);
     transition: background 1s;
     font-family: Arial, sans-serif; /* Set default font family */
+    color: var(--text-color-light); /* Set default text color */
 }
 
 body.dark-mode {
     background: var(--background-dark);
+    color: var(--text-color-dark);
 }
 
 .login-container {
@@ -39,12 +41,10 @@ body.dark-mode {
     transition: background 1s, color 1s;
     position: relative;
     overflow: hidden;
-    color: var(--text-color-light); /* Set default text color */
 }
 
 body.dark-mode .login-container {
     background: var(--container-bg-dark);
-    color: var(--text-color-dark);
 }
 
 form {
@@ -205,11 +205,6 @@ input:checked + .slider .moon-icon {
     animation: star 2s infinite ease-in-out;
 }
 
-body.dark-mode .star-container,
-.star-container {
-    display: block;
-}
-
 .star-container {
     position: absolute;
     top: 0;
@@ -218,6 +213,7 @@ body.dark-mode .star-container,
     height: 100%;
     overflow: hidden;
     pointer-events: none;
+    display: block;
 }
 
 .star:nth-child(1) {
@@ -249,29 +245,4 @@ body.dark-mode .star-container,
     left: 30%;
     animation-delay: 0.8s;
 }
-
-.star:nth-child(6) {
-    top: 70%;
-    left: 80%;
-    animation-delay: 1s;
-}
-
-.star:nth-child(7) {
-    top: 10%;
-    left: 40%;
-    animation-delay: 1.2s;
-}
-
-.star:nth-child(8) {
-    top: 90%;
-    left: 10%;
-    animation-delay: 1.4s;
-}
-
-.star:nth-child(9) {
-    top: 30%;
-    left: 70%;
-    animation-delay: 1.6s;
-}
-
-.star:nth-child(10
+``
