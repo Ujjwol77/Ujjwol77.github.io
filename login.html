@@ -5,27 +5,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Login Page</title>
 <link rel="stylesheet" href="maya.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"> <!-- Font Awesome for icons -->
 </head>
 <body>
 <div class="login-container">
-    <h2>Admin Login</h2>
-    <div class="input-container">
+    <label class="switch" id="mode-switch">
+        <input type="checkbox" id="mode-toggle">
+        <span class="slider round">
+            <span class="icon sun-icon">☀️</span>
+            <span class="icon moon-icon">🌙</span>
+        </span>
+    </label>
+    <div class="star-container">
+        <!-- Stars -->
+    </div>
+    <form id="login-form">
+        <h2>Admin Login</h2>
         <input type="text" id="username" placeholder="Username" required>
         <input type="password" id="password" placeholder="Password" required>
-    </div>
-    <div class="password-toggle" onclick="togglePasswordVisibility()">
-        <i class="fas fa-eye"></i>
-    </div>
-    <button type="submit">Login</button>
-    <div class="switch">
-        <input type="checkbox" id="mode-toggle">
-        <label for="mode-toggle" class="slider"></label>
-        <div class="icon sun-icon"><i class="fas fa-sun"></i></div>
-        <div class="icon moon-icon"><i class="fas fa-moon"></i></div>
-    </div>
+        <button type="submit">Login</button>
+    </form>
 </div>
-<div class="rain"></div> <!-- Rain effect container -->
 
 <script src="ujju.js"></script>
 </body>
