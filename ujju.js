@@ -24,3 +24,10 @@ document.getElementById('login-form').addEventListener('submit', function(event)
         alert('Invalid username or password. Please try again.');
     }
 });
+
+// Function to toggle dark mode and star rain effect
+document.getElementById('mode-toggle').addEventListener('change', function() {
+    document.body.classList.toggle('dark-mode');
+    document.querySelector('.star-container').classList.toggle('show-stars');
+});
+
