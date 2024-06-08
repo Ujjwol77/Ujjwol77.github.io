@@ -15,7 +15,7 @@ button {
 
 /* Styles for dark mode */
 body.dark-mode {
-    filter: invert(1); /* Invert colors for dark mode */
+    filter: invert(1); /* Invert colors for dark mode */ 
 }
 
 /* Star animation */
