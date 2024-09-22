@@ -1,0 +1,92 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: antiquewhite;
+    margin: 0;
+}
+
+h1:hover {
+    color: rgb(255, 210, 142);
+    transition: color 0.3s ease-in-out;
+}
+
+#display {
+    max-width: 600px;
+    font-size: 3em;
+    margin-bottom: 20px;
+    background-color: rgb(255, 210, 142);
+    color: black;
+    padding: 20px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease-in-out;
+}
+
+#display:hover {
+    background-color: rgb(0, 0, 0);
+    color: rgb(255, 210, 142);
+}
+
+.buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 1.2em;
+    color: white;
+    background-color: #4CAF50;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+
+button:nth-child(1) {
+    background-color: #4CAF50; /* Green */
+}
+
+button:nth-child(2) {
+    background-color: #2196F3; /* Blue */
+}
+
+button:nth-child(3) {
+    background-color: #f44336; /* Red */
+}
+
+button:nth-child(4) {
+    background-color: #ffeb3b; /* Yellow */
+    color: black;
+}
+
+button:hover {
+    transform: scale(1.1) rotate(1deg);
+    animation: shake 0.3s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-5px);
+    }
+    50% {
+        transform: translateX(5px);
+    }
+    75% {
+        transform: translateX(-5px);
+    }
+}
+
+button:active {
+    transform: scale(1.05);
+    background-color: #333;
+}
