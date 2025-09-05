@@ -1,20 +1,106 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark" data-palette="blue">
 <head>
-  <meta charset="UTF-8">
-  <title>Ujjwol's games</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Typing Speed Test</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css" />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="description" content="A minimal, aesthetic typing speed game with WPM, accuracy, leaderboard, difficulty and theme palettes." />
 </head>
 <body>
-  <h1>Show me some Speed Myan</h1>
-  <nav>
-    <button onclick="showTypingTest()">Typing Speed Test</button>
-    <!-- Add more buttons for other games here -->
-  </nav>
-  <div id="gameArea">
-    <!-- Game content will be loaded here -->
+  <div class="container">
+    <header class="app-header">
+      <h1>Typing Speed Test</h1>
+      <div class="toggles">
+        <!-- Click = next palette | Shift+Click = dark/light -->
+        <button id="themeToggle" class="btn ghost" aria-label="Theme and palette"
+                title="Click: change colors • Shift+Click: Dark/Light">🌗 Theme</button>
+      </div>
+    </header>
+
+    <section class="game-card controls">
+      <div class="row">
+        <label class="field">
+          <span class="label">Difficulty</span>
+          <span class="select-wrap">
+            <select id="difficulty" class="select">
+              <option value="easy">Easy</option>
+              <option value="normal" selected>Normal</option>
+              <option value="hard">Hard</option>
+            </select>
+          </span>
+        </label>
+
+        <label class="field">
+          <span class="label">Session</span>
+          <span class="select-wrap">
+            <select id="sessionLength" class="select">
+              <option value="30">30s</option>
+              <option value="60" selected>60s</option>
+              <option value="120">120s</option>
+            </select>
+          </span>
+        </label>
+
+        <label class="field">
+          <span class="label">Player name</span>
+          <input id="playerName" class="text" type="text" placeholder="Enter your name" maxlength="20" />
+        </label>
+      </div>
+
+      <div class="row actions">
+        <button id="startBtn" class="btn primary">Start</button>
+        <button id="nextBtn" class="btn" disabled>Next Sentence</button>
+        <button id="resetBtn" class="btn danger" disabled>Reset</button>
+      </div>
+    </section>
+
+    <section id="gameArea" class="game-card">
+      <div id="sentence" class="sentence" aria-live="polite"></div>
+
+      <div class="progress-wrap" aria-hidden="true">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
+
+      <input
+        id="input"
+        class="type-input"
+        type="text"
+        inputmode="latin"
+        placeholder="Start typing here..."
+        autocomplete="off"
+        disabled
+        aria-label="Typing input"
+      />
+
+      <div class="stats">
+        <div><span id="timer" class="stat-num">0</span><span class="stat-label">Time (s)</span></div>
+        <div><span id="liveWPM" class="stat-num">0</span><span class="stat-label">WPM</span></div>
+        <div><span id="liveACC" class="stat-num">100%</span><span class="stat-label">Accuracy</span></div>
+        <div><span id="mistakes" class="stat-num">0</span><span class="stat-label">Mistakes</span></div>
+      </div>
+
+      <div id="result" class="result" aria-live="polite"></div>
+    </section>
+
+    <section id="leaderboard" class="game-card">
+      <h2>Leaderboard</h2>
+      <ol id="leaderboardList" class="leaderboard"></ol>
+    </section>
+
+    <footer class="app-footer">
+      <p id="tips" class="tips" aria-live="polite">
+        Use <kbd>Shift</kbd> + <kbd>Left Click</kbd> on Theme to toggle dark and light mode.
+      </p>
+    </footer>
   </div>
+
   <script src="script.js"></script>
 </body>
 </html>
