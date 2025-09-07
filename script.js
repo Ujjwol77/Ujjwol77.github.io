@@ -1,322 +1,347 @@
-/* New Version update
-*/
+/* New Version update */
+const $ = (id) => document.getElementById(id);
 
-(() => {
-  /* ---------- Sentences ---------- */
-  const BANK = {
-    easy: [
-      "The quick brown fox jumps over the lazy dog.",
-      "Typing fast is a useful skill.",
-      "Practice a little every day.",
-      "Coding is fun and creative.",
-      "Focus on accuracy then speed."
-    ],
-    normal: [
-      "JavaScript is fun to learn and use for building interactive pages.",
-      "Consistent practice builds muscle memory and smooth typing flow.",
-      "Small mistakes are normal; correct them and keep moving.",
-      "Keep your hands relaxed and look ahead to the next word.",
-      "A well-placed backspace is better than a string of errors."
-    ],
-    hard: [
-      "Sustained concentration improves precision; precision, in turn, unlocks speed.",
-      "Discipline grows from repetition, but curiosity transforms repetition into mastery.",
-      "Beware of cognitive tunneling; maintain peripheral awareness of upcoming words.",
-      "Latency in feedback loops can distort perception; trust measured metrics.",
-      "Typing efficiency emerges from posture, rhythm, and anticipatory scanning."
-    ]
-  };
+const els = {
+  target: $("targetText"),
+  editor: $("editor"),
+  timeLeft: $("timeLeft"),
+  wpm: $("wpm"),
+  acc: $("accuracy"),
+  mistakes: $("mistakes"),
+  start: $("startBtn"),
+  pause: $("pauseBtn"),
+  next: $("nextBtn"),
+  reset: $("resetBtn"),
+  dur: $("duration"),
+  diff: $("difficulty"),
+  theme: $("themeToggle"),
+  countdown: $("countdown"),
+  tipText: $("tipText"),
+};
 
-  /* ---------- Theme / Palette ---------- */
-  const PALETTES = ["blue", "emerald", "rose", "violet", "amber"];
-  const STORE = {
-    theme: "tts_theme_v1",
-    palette: "tts_palette_v1",
-    scores: "tts_scores_v1",
-  };
+function on(el, ev, fn){ el && el.addEventListener(ev, fn); }
+function txt(el, v){ el && (el.textContent = v); }
+function attr(el, n, v){ el && el.setAttribute(n, v); }
 
-  const docEl = document.documentElement;
+let state = {
+  running: false,
+  startTime: null,
+  remaining: 60,
+  timerId: null,
+  countdownId: null,
+  session: { typed: 0, correct: 0 },
+  currentSentence: "",
+};
 
-  function lsGet(key, fallback) {
-    try { const v = localStorage.getItem(key); return v == null ? fallback : v; }
-    catch { return fallback; }
+/* ---------------- THEME (button only) ---------------- */
+function setTheme(next){
+  document.documentElement.setAttribute("data-theme", next);
+  try{ localStorage.setItem("tm_theme", next); }catch{}
+  attr(els.theme, "aria-pressed", next === "dark" ? "false" : "true");
+}
+function getTheme(){ try{ return localStorage.getItem("tm_theme") || "dark"; }catch{ return "dark"; } }
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute("data-theme") || "dark";
+  setTheme(cur === "dark" ? "light" : "dark");
+}
+
+/* ---------------- MEANINGFUL SENTENCE GENERATOR ----------------
+   Grammar-aware templates with determiners (a/an/the),
+   intransitive vs transitive verbs, optional adjectives & adverbs.
+----------------------------------------------------------------- */
+
+// Word banks per difficulty (kept simple & coherent)
+const BANK = {
+  easy: {
+    nouns: ["cat","dog","child","bird","teacher","runner","sun","rain","river","garden","car","phone","book","music","game"],
+    objects: ["ball","toy","food","letter","door","window","chair","bag","drink","snack","lesson","plan","story"],
+    adjs: ["quiet","happy","calm","quick","bright","soft","simple","brave","friendly","fresh"],
+    adverbs: ["slowly","quickly","calmly","softly","happily"],
+    vi: ["runs","walks","rests","plays","smiles","waits","learns","sleeps","dances","shines"],
+    vt: ["reads","opens","closes","brings","carries","writes","holds","starts","shares","builds","checks"]
+  },
+  normal: {
+    nouns: ["developer","student","team","system","keyboard","writer","manager","engineer","designer","server","browser","network","project"],
+    objects: ["feature","document","report","email","draft","module","layout","schedule","backup","dataset","update","release"],
+    adjs: ["focused","reliable","careful","patient","curious","practical","helpful","precise","creative","confident"],
+    adverbs: ["clearly","smoothly","steadily","carefully","quickly","quietly"],
+    vi: ["improves","practices","types","focuses","collaborates","reviews","deploys","iterates","syncs","responds"],
+    vt: ["tests","builds","writes","reviews","organizes","tracks","fixes","optimizes","updates","prepares","configures"]
+  },
+  hard: {
+    nouns: ["researcher","analyst","algorithm","protocol","workflow","pipeline","dataset","mechanism","interface","scheduler","compiler"],
+    objects: ["hypothesis","model","benchmark","proposal","artifact","prototype","specification","metric","record","schema","release"],
+    adjs: ["deterministic","robust","granular","syntactic","orthogonal","resilient","adaptive","probabilistic","scalable","precise"],
+    adverbs: ["rigorously","meticulously","concisely","reliably","efficiently","consistently"],
+    vi: ["converges","generalizes","synchronizes","stabilizes","validates","profiles","benchmarks","compiles"],
+    vt: ["evaluates","calibrates","orchestrates","documents","verifies","aligns","optimizes","integrates","refactors","instrumentes"]
   }
-  function lsSet(key, value) {
-    try { localStorage.setItem(key, value); } catch {}
+};
+
+// helpers
+const r = (arr) => arr[Math.floor(Math.random()*arr.length)];
+const cap = (s) => s ? s[0].toUpperCase() + s.slice(1) : s;
+const vowel = (c) => "aeiou".includes((c||"").toLowerCase());
+function det(word) { // a/an/the (50% the, 50% a/an)
+  if (Math.random() < 0.5) return "the";
+  return vowel(word[0]) ? "an" : "a";
+}
+function maybeAdj(adjs){ return Math.random()<0.55 ? r(adjs) : ""; }
+function maybeAdv(advs){ return Math.random()<0.45 ? r(advs) : ""; }
+
+// Build noun phrase like "the quick dog" / "a robust protocol"
+function np(bank, isSubject=true){
+  const n = r(bank.nouns);
+  const a = maybeAdj(bank.adjs);
+  const article = det(a ? a : n);
+  return `${article} ${[a,n].filter(Boolean).join(" ")}`.trim();
+}
+// Build object NP from objects pool (so transitive verbs make sense)
+function op(bank){
+  const n = r(bank.objects);
+  const a = maybeAdj(bank.adjs);
+  const article = det(a ? a : n);
+  return `${article} ${[a,n].filter(Boolean).join(" ")}`.trim();
+}
+
+// Templates:
+//  T1: [NP] [vi] [adv].                            e.g., The calm dog runs quickly.
+//  T2: [NP] [vt] [OP] [adv].                       e.g., The developer tests a feature carefully.
+//  T3: [NP] [vt] [OP], and [NP] [vi] [adv].        e.g., The team builds a module, and the system responds smoothly.
+//  T4: [NP] [vi], then [NP] [vt] [OP].             e.g., The writer reviews, then the manager approves a draft.
+function generateMeaningfulSentence(level){
+  const bank = BANK[level] || BANK.normal;
+  const t = Math.random();
+  if (t < 0.35) {
+    const s = np(bank); const v = r(bank.vi); const adv = maybeAdv(bank.adverbs);
+    return cap([s, v, adv].filter(Boolean).join(" ")) + ".";
+  } else if (t < 0.7) {
+    const s = np(bank); const v = r(bank.vt); const o = op(bank); const adv = maybeAdv(bank.adverbs);
+    return cap([s, v, o, adv].filter(Boolean).join(" ")) + ".";
+  } else if (t < 0.85) {
+    const s1 = np(bank), v1 = r(bank.vt), o1 = op(bank);
+    const s2 = np(bank), v2 = r(bank.vi), adv2 = maybeAdv(bank.adverbs);
+    return cap(`${s1} ${v1} ${o1}, and ${s2} ${[v2,adv2].filter(Boolean).join(" ")}`) + ".";
+  } else {
+    const s1 = np(bank), v1 = r(bank.vi);
+    const s2 = np(bank), v2 = r(bank.vt), o2 = op(bank);
+    return cap(`${s1} ${v1}, then ${s2} ${v2} ${o2}`) + ".";
   }
+}
 
-  function applyTheme(mode, palette) {
-    const safeMode = mode === "light" ? "light" : "dark";
-    const safePalette = PALETTES.includes(palette) ? palette : "blue";
-    docEl.setAttribute("data-theme", safeMode);
-    docEl.setAttribute("data-palette", safePalette);
-    lsSet(STORE.theme, safeMode);
-    lsSet(STORE.palette, safePalette);
+/* ---------------- RENDERING & METRICS ---------------- */
+function esc(s){ return (s??"").replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m])); }
+function paint(target, input){
+  const out=[], L=Math.max(target.length, input.length);
+  for(let i=0;i<L;i++){
+    const t = target[i]??"", b = input[i]??"";
+    let cls="pending", ch=t;
+    if(b===""){ cls="pending"; ch=t; }
+    else if(b===t){ cls="correct"; ch=t; }
+    else{ cls="incorrect"; ch=b; }
+    out.push(`<span class="${cls}">${esc(ch)}</span>`);
   }
-
-  function initTheme() {
-    const savedMode = lsGet(STORE.theme, docEl.getAttribute("data-theme") || "dark");
-    const savedPalette = lsGet(STORE.palette, docEl.getAttribute("data-palette") || "blue");
-    applyTheme(savedMode, savedPalette);
+  els.target.innerHTML = out.join("");
+}
+function measure(target, input){
+  const L=Math.max(target.length,input.length);
+  let correct=0, typed=input.length;
+  for(let i=0;i<L;i++){
+    const t=target[i]??"", b=input[i]??"";
+    if(b!=="" && b===t) correct++;
   }
+  const elapsedMs = state.startTime ? (Date.now()-state.startTime) : 0;
+  const elapsedMin = Math.max(1e-6, elapsedMs/60000);
+  const sessionCorrect = state.session.correct + correct;
+  const sessionTyped   = state.session.typed + typed;
+  const wpm = Math.max(0, Math.round((sessionCorrect/5)/elapsedMin));
+  const acc = Math.round(100 * sessionCorrect / Math.max(1, sessionTyped));
+  const mistakesShown = Math.max(0, sessionTyped - sessionCorrect);
+  return { correct, typed, wpm, acc, mistakesShown };
+}
+function updateHud(m){
+  txt(els.wpm, String(m.wpm));
+  txt(els.acc, `${m.acc}%`);
+  txt(els.mistakes, String(m.mistakesShown));
+}
 
-  /* ---------- Elements ---------- */
-  const els = {
-    input: document.getElementById("input"),
-    sentence: document.getElementById("sentence"),
-    result: document.getElementById("result"),
-    timer: document.getElementById("timer"),
-    wpm: document.getElementById("liveWPM"),
-    acc: document.getElementById("liveACC"),
-    mistakes: document.getElementById("mistakes"),
-    progress: document.getElementById("progressBar"),
-    startBtn: document.getElementById("startBtn"),
-    nextBtn: document.getElementById("nextBtn"),
-    resetBtn: document.getElementById("resetBtn"),
-    difficulty: document.getElementById("difficulty"),
-    sessionLength: document.getElementById("sessionLength"),
-    playerName: document.getElementById("playerName"),
-    themeToggle: document.getElementById("themeToggle"),
-    leaderboardList: document.getElementById("leaderboardList"),
-    tips: document.getElementById("tips"),
-  };
+function difficulty(){ return els.diff?.value || "normal"; }
+function duration(){ return parseInt(els.dur?.value,10) || 60; }
 
-  /* ---------- Game State ---------- */
-  let startTime = null;
-  let currentSentence = "";
-  let mistakesCount = 0;
-  let finished = false;
-  let secondTick = null;
-  let liveTick = null;
-  let sessionSeconds = 60;
+function newSentence(refreshHud=false){
+  state.currentSentence = generateMeaningfulSentence(difficulty());
+  els.editor.value = "";
+  paint(state.currentSentence, "");
+  if (refreshHud) compute();
+}
+function compute(){
+  const input = els.editor.value;
+  const m = measure(state.currentSentence, input);
+  paint(state.currentSentence, input);
+  updateHud(m);
 
-  /* ---------- Helpers ---------- */
-  const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
-  const now = () => Date.now();
-
-  function pickSentence() {
-    const level = (els.difficulty && els.difficulty.value) || "normal";
-    const pool = BANK[level] || BANK.normal;
-    return pool[Math.floor(Math.random() * pool.length)];
+  // Auto-advance when fully matched (exact sentence)
+  if (input.length >= state.currentSentence.length && input === state.currentSentence){
+    state.session.correct += m.correct;
+    state.session.typed   += m.typed;
+    newSentence(true);
   }
+}
 
-  function renderSentence(typed = "") {
-    const out = [];
-    for (let i = 0; i < currentSentence.length; i++) {
-      const c = currentSentence[i];
-      const t = typed[i];
-      let cls = "default";
-      if (t != null) cls = t === c ? "correct" : "wrong";
-      const caret = i === typed.length ? " caret" : "";
-      out.push(`<span class="${cls}${caret}">${c === " " ? "&nbsp;" : c}</span>`);
-    }
-    els.sentence.innerHTML = out.join("");
-    const p = currentSentence.length ? (typed.length / currentSentence.length) * 100 : 0;
-    els.progress.style.width = `${clamp(p, 0, 100)}%`;
-  }
+/* ---------------- FLOW (mouse-only) ---------------- */
+function startCountdownThenRun(){
+  let n=3;
+  txt(els.countdown, n);
+  els.countdown.classList.remove("hidden");
+  attr(els.countdown, "aria-hidden", "false");
+  clearInterval(state.countdownId);
+  state.countdownId = setInterval(()=>{
+    n--;
+    if(n<=0){
+      clearInterval(state.countdownId);
+      els.countdown.classList.add("hidden");
+      attr(els.countdown, "aria-hidden", "true");
+      beginRun();
+    }else{ txt(els.countdown, n); }
+  },1000);
+}
+function beginRun(){
+  if(state.running) return;
+  state.running = true;
+  els.start.disabled=true; els.pause.disabled=false;
+  els.editor.removeAttribute("disabled"); els.editor.focus();
 
-  function accuracyOf(original, typed) {
-    const len = original.length;
-    let correct = 0;
-    for (let i = 0; i < len; i++) if (typed[i] === original[i]) correct++;
-    return len ? (correct / len) * 100 : 100;
-  }
+  state.remaining = duration();
+  txt(els.timeLeft, state.remaining);
 
-  function wordsCount(text) {
-    const t = text.trim();
-    return t ? t.split(/\s+/).length : 0;
-  }
+  clearInterval(state.timerId);
+  state.timerId = setInterval(()=>{
+    if(!state.running) return;
+    state.remaining -= 1;
+    txt(els.timeLeft, state.remaining);
+    if(state.remaining<=0) finishRun();
+  },1000);
+}
+function finishRun(){
+  state.running=false;
+  clearInterval(state.timerId);
+  els.pause.disabled=true; els.start.disabled=false;
+  els.editor.setAttribute("disabled","true");
 
-  function wpmOf(typed, elapsedSeconds) {
-    if (elapsedSeconds <= 0) return 0;
-    return (wordsCount(typed) / elapsedSeconds) * 60;
-  }
+  const input = els.editor.value;
+  const m = measure(state.currentSentence, input);
+  state.session.correct += m.correct;
+  state.session.typed   += m.typed;
+  compute();
+}
+function pauseRun(){
+  if(!state.running) return;
+  state.running=false;
+  els.pause.disabled=true; els.start.disabled=false;
+}
+function nextSentence(){
+  const input = els.editor.value;
+  const m = measure(state.currentSentence, input);
+  state.session.correct += m.correct;
+  state.session.typed   += m.typed;
+  newSentence(true);
+}
+function resetAll(){
+  clearInterval(state.timerId);
+  clearInterval(state.countdownId);
+  state.running=false; state.startTime=null; state.remaining=duration();
+  state.timerId=null; state.countdownId=null; state.session={typed:0, correct:0};
 
-  /* ---------- Game Flow ---------- */
-  function startGame() {
-    finished = false;
-    mistakesCount = 0;
-    sessionSeconds = parseInt(els.sessionLength.value, 10) || 60;
+  txt(els.timeLeft, state.remaining);
+  txt(els.wpm, "0");
+  txt(els.acc, "100%");
+  txt(els.mistakes, "0");
+  els.editor.value=""; els.editor.setAttribute("disabled","true");
+  els.start.disabled=false; els.pause.disabled=true;
 
-    els.input.value = "";
-    currentSentence = pickSentence();
-    renderSentence("");
+  newSentence(true);
+}
 
-    els.input.disabled = false;
-    els.input.focus();
+/* --- Mode (light/dark) --- */
+function setMode(m) {
+  document.documentElement.setAttribute("data-mode", m);
+  try { localStorage.setItem("tm_mode", m); } catch {}
+}
+function getMode(){ try{ return localStorage.getItem("tm_mode") || "dark"; }catch{ return "dark"; } }
+function toggleMode(){
+  const cur = document.documentElement.getAttribute("data-mode") || "dark";
+  setMode(cur === "dark" ? "light" : "dark");
+}
 
-    els.startBtn.disabled = true;
-    els.nextBtn.disabled = true;
-    els.resetBtn.disabled = false;
+/* --- Theme palettes --- */
+const THEMES = ["blue","green","purple","orange"];
+function setTheme(t) {
+  document.documentElement.setAttribute("data-theme", t);
+  try { localStorage.setItem("tm_theme", t); } catch {}
+}
+function getTheme(){ try{ return localStorage.getItem("tm_theme") || "blue"; }catch{ return "blue"; } }
+function cycleTheme(){
+  const cur = document.documentElement.getAttribute("data-theme") || "blue";
+  const idx = THEMES.indexOf(cur);
+  const next = THEMES[(idx+1) % THEMES.length];
+  setTheme(next);
+}
 
-    els.result.textContent = "";
-    els.mistakes.textContent = "0";
-    els.timer.textContent = "0";
-    els.wpm.textContent = "0";
-    els.acc.textContent = "100%";
+/* --- Init --- */
+document.addEventListener("DOMContentLoaded", () => {
+  // restore saved
+  setMode(getMode());
+  setTheme(getTheme());
 
-    startTime = now();
+  // hook buttons
+  document.getElementById("modeBtn").addEventListener("click", toggleMode);
+  document.getElementById("themeBtn").addEventListener("click", cycleTheme);
 
-    clearInterval(secondTick);
-    clearInterval(liveTick);
+  // ...rest of your init (resetAll, tips, etc)...
+});
 
-    let elapsed = 0;
-    secondTick = setInterval(() => {
-      elapsed++;
-      els.timer.textContent = String(elapsed);
-      if (elapsed >= sessionSeconds) finishGame();
-    }, 1000);
+/* ---------------- Tips (#5 ↔ #66, fade) ---------------- */
+const TIPS = {
+  5:  "Tip #5 — Accuracy first; speed follows.",
+  66: "Tip #66 — Build rhythm: steady cadence beats bursts."
+};
+let tipIdx = 5, tipsTimer=null;
+function setTip(text){
+  els.tipText.classList.remove("fade-in");
+  els.tipText.classList.add("fade-out");
+  setTimeout(()=>{
+    els.tipText.textContent = text;
+    els.tipText.classList.remove("fade-out");
+    els.tipText.classList.add("fade-in");
+  },300);
+}
+function startTips(){
+  setTip(TIPS[tipIdx]);
+  clearInterval(tipsTimer);
+  tipsTimer = setInterval(()=>{
+    tipIdx = (tipIdx===5)?66:5;
+    setTip(TIPS[tipIdx]);
+  },10000);
+}
 
-    liveTick = setInterval(() => {
-      const seconds = (now() - startTime) / 1000;
-      const typed = els.input.value;
-      els.wpm.textContent = Math.max(0, wpmOf(typed, seconds)).toFixed(0);
-      els.acc.textContent = `${clamp(accuracyOf(currentSentence, typed), 0, 100).toFixed(0)}%`;
-    }, 120);
-  }
+/* ---------------- Init (no keyboard bindings) ---------------- */
+document.addEventListener("DOMContentLoaded", ()=>{
+  setTheme(getTheme());
+  on(els.theme, "click", toggleTheme);
+  txt($("y"), new Date().getFullYear());
 
-  function finishGame() {
-    if (finished) return;
-    finished = true;
-    clearInterval(secondTick); clearInterval(liveTick);
+  on(els.start, "click", startCountdownThenRun);
+  on(els.pause, "click", pauseRun);
+  on(els.next, "click", nextSentence);
+  on(els.reset, "click", resetAll);
 
-    els.input.disabled = true;
-    els.startBtn.disabled = false;
-    els.nextBtn.disabled = false;
-    els.resetBtn.disabled = false;
+  on(els.dur, "change", ()=>{ if(!state.running) txt(els.timeLeft, els.dur.value); });
+  on(els.editor, "input", ()=>{
+    if(!state.startTime && els.editor.value.length>0) state.startTime = Date.now();
+    compute();
+  });
 
-    const totalSeconds = Math.max(0.001, (now() - startTime) / 1000);
-    const typed = els.input.value;
-    const finalWPM = Math.max(0, wpmOf(typed, totalSeconds)).toFixed(0);
-    const finalACC = clamp(accuracyOf(currentSentence, typed), 0, 100).toFixed(0);
+  resetAll();
+  startTips();
+});
 
-    els.result.textContent =
-      `⏱ ${totalSeconds.toFixed(1)}s  •  🏃 WPM: ${finalWPM}  •  🎯 Accuracy: ${finalACC}%  •  ❌ Mistakes: ${mistakesCount}`;
-
-    saveScore({
-      name: (els.playerName.value || "Anonymous").slice(0, 20),
-      wpm: Number(finalWPM),
-      acc: Number(finalACC),
-      when: new Date().toISOString(),
-    });
-    renderLeaderboard();
-  }
-
-  function nextSentence() {
-    if (finished) { startGame(); return; }
-    els.input.value = "";
-    currentSentence = pickSentence();
-    renderSentence("");
-    els.input.focus();
-  }
-
-  function resetGame() {
-    clearInterval(secondTick); clearInterval(liveTick);
-    startTime = null; mistakesCount = 0; finished = false;
-    els.input.value = ""; els.result.textContent = "";
-    els.wpm.textContent = "0"; els.acc.textContent = "100%";
-    els.timer.textContent = "0"; els.mistakes.textContent = "0";
-    els.progress.style.width = "0%"; currentSentence = "";
-    renderSentence("");
-    els.input.disabled = true;
-    els.startBtn.disabled = false; els.nextBtn.disabled = true; els.resetBtn.disabled = true;
-  }
-
-  /* ---------- Leaderboard (localStorage, github.io safe) ---------- */
-  function readScores() {
-    try { return JSON.parse(localStorage.getItem(STORE.scores) || "[]"); }
-    catch { return []; }
-  }
-  function writeScores(arr) {
-    try { localStorage.setItem(STORE.scores, JSON.stringify(arr)); } catch {}
-  }
-  function saveScore(entry) {
-    const scores = readScores();
-    scores.push(entry);
-    scores.sort((a,b) => b.wpm - a.wpm || b.acc - a.acc);
-    writeScores(scores.slice(0, 10));
-  }
-  function renderLeaderboard() {
-    const list = els.leaderboardList;
-    list.innerHTML = "";
-    const scores = readScores();
-    scores.forEach((s, i) => {
-      const li = document.createElement("li");
-      li.innerHTML =
-        `<strong>#${i+1}</strong> — ${escapeHtml(s.name)} • <b>${s.wpm} WPM</b> • ${s.acc}% • ` +
-        `<span style="opacity:.75">${new Date(s.when).toLocaleDateString()}</span>`;
-      list.appendChild(li);
-    });
-  }
-  function escapeHtml(str) {
-    return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-  }
-
-  /* ---------- Input handling ---------- */
-  function onInput(e) {
-    if (finished || !currentSentence) return;
-    const typed = e.target.value;
-    const i = typed.length - 1;
-    if (i >= 0 && typed[i] !== currentSentence[i]) {
-      mistakesCount++; els.mistakes.textContent = String(mistakesCount);
-    }
-    renderSentence(typed);
-    if (typed === currentSentence) setTimeout(nextSentence, 250);
-  }
-
-  /* ---------- Theme toggle ---------- */
-  function onThemeToggle(ev) {
-    const mode = docEl.getAttribute("data-theme") || "dark";
-    const palette = docEl.getAttribute("data-palette") || "blue";
-
-    if (ev.shiftKey) {
-      // dark <-> light
-      applyTheme(mode === "dark" ? "light" : "dark", palette);
-      return;
-    }
-    // cycle palettes
-    const idx = PALETTES.indexOf(palette);
-    const next = PALETTES[(idx + 1) % PALETTES.length];
-    applyTheme(mode, next);
-  }
-
-  /* ---------- Footer tips (rotate every 10s) ---------- */
-  const TIP_LIST = [
-    "Use <kbd>Shift</kbd> + <kbd>Left Click</kbd> on Theme to toggle dark and light mode.",
-    "Use <kbd>Tab</kbd> to focus input fast. Theme remembers your palette &amp; mode."
-  ];
-  let tipIndex = 0;
-  function startTips() {
-    if (!els.tips) return;
-    els.tips.innerHTML = TIP_LIST[tipIndex];
-    setInterval(() => {
-      els.tips.classList.add("fade-out");
-      setTimeout(() => {
-        tipIndex = (tipIndex + 1) % TIP_LIST.length;
-        els.tips.innerHTML = TIP_LIST[tipIndex];
-        els.tips.classList.remove("fade-out");
-      }, 400); // match CSS transition
-    }, 10000);
-  }
-
-  /* ---------- Boot ---------- */
-  function boot() {
-    initTheme();
-
-    els.startBtn.addEventListener("click", startGame);
-    els.nextBtn.addEventListener("click", nextSentence);
-    els.resetBtn.addEventListener("click", resetGame);
-    els.input.addEventListener("input", onInput);
-    els.input.addEventListener("keydown", (e) => {
-      if (e.key === "Tab") { e.preventDefault(); els.input.focus(); }
-    });
-    els.themeToggle.addEventListener("click", onThemeToggle);
-
-    renderLeaderboard();
-    renderSentence("");
-    resetGame();
-    startTips();
-  }
-
-  window.addEventListener("load", boot);
-})();
