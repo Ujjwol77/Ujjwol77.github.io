@@ -3,76 +3,86 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>TypeMaster – Typing Speed Test (WPM & Accuracy)</title>
-  <meta name="description" content="TypeMaster: a fast, accurate typing speed test. Practice with difficulty levels and timed sessions. Track WPM, accuracy, and mistakes with real-time feedback." />
+  <title>TypeMaster — Typing Speed Test</title>
+  <meta name="description" content="TypeMaster: accurate typing test with auto-generated sentences, WPM, accuracy, and mistakes." />
   <link rel="icon" href="assets/favicon.png" />
-  <link rel="canonical" href="https://www.example.com/typing-test.html" />
-
-  <!-- Social preview -->
-  <meta property="og:title" content="TypeMaster – Typing Speed Test" />
-  <meta property="og:description" content="Real-time WPM, accuracy, mistakes tracking. Practice on easy/normal/hard with timed sessions." />
-  <meta property="og:image" content="https://www.example.com/assets/typing-share.png" />
-  <meta property="og:type" content="website" />
-  <meta name="twitter:card" content="summary_large_image" />
-
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <a class="skip-link" href="#test">Skip to typing test</a>
+  <header class="shell">
+    <div class="topbar">
+      <h1 class="brand">TypeMaster</h1>
+      <button id="themeBtn" class="btn ghost" title="Cycle theme">Theme</button>
+      <button id="modeBtn" class="btn ghost" title="Toggle dark/light">Dark / Light</button>
+    </div>
 
-  <header class="container header">
-    <h1 class="brand" aria-label="TypeMaster">TypeMaster</h1>
-    <div class="controls-row">
-      <button id="themeToggle" class="btn" aria-pressed="false" title="Toggle theme (light/dark)">Theme</button>
+    
 
-      <label for="difficulty" class="lbl">Difficulty</label>
-      <select id="difficulty" class="select" aria-label="Select difficulty">
-        <option value="easy">Easy</option>
-        <option value="normal" selected>Normal</option>
-        <option value="hard">Hard</option>
-      </select>
 
-      <label for="duration" class="lbl">Session</label>
-      <select id="duration" class="select" aria-label="Select session length">
-        <option value="30">30s</option>
-        <option value="60" selected>60s</option>
-        <option value="120">120s</option>
-      </select>
+    <div class="controls">
+      <div class="ctl">
+        <label for="difficulty">Difficulty</label>
+        <select id="difficulty">
+          <option value="easy">Easy</option>
+          <option value="normal" selected>Normal</option>
+          <option value="hard">Hard</option>
+        </select>
+      </div>
 
-      <button id="startBtn" class="btn primary" aria-controls="editor" aria-label="Start test (Space)">Start</button>
-      <button id="pauseBtn" class="btn" disabled aria-label="Pause test (Space)">Pause</button>
-      <button id="nextBtn" class="btn" aria-label="Next sentence (N)">Next</button>
-      <button id="resetBtn" class="btn" aria-label="Reset test (R)">Reset</button>
+      <div class="ctl">
+        <label for="duration">Session</label>
+        <select id="duration">
+          <option value="30">30s</option>
+          <option value="60" selected>60s</option>
+          <option value="120">120s</option>
+        </select>
+      </div>
+
+      <div class="actions">
+        <button id="startBtn" class="btn primary" aria-label="Start (Space)">Start</button>
+        <button id="pauseBtn" class="btn" disabled aria-label="Pause (Space)">Pause</button>
+        <button id="nextBtn" class="btn" aria-label="Next sentence (N)">Next</button>
+        <button id="resetBtn" class="btn" aria-label="Reset (R)">Reset</button>
+      </div>
     </div>
   </header>
 
-  <main class="container" id="test">
-    <section class="hud" aria-live="polite">
-      <div class="stat"><span class="k">Time</span><span id="timeLeft" class="v">60</span></div>
-      <div class="stat"><span class="k">WPM</span><span id="wpm" class="v">0</span></div>
-      <div class="stat"><span class="k">Accuracy</span><span id="accuracy" class="v">100%</span></div>
-      <div class="stat"><span class="k">Mistakes</span><span id="mistakes" class="v">0</span></div>
+  <main class="shell">
+    <section class="stats">
+      <div class="card">
+        <div class="k">Time</div><div id="timeLeft" class="v">60</div>
+      </div>
+      <div class="card">
+        <div class="k">WPM</div><div id="wpm" class="v">0</div>
+      </div>
+      <div class="card">
+        <div class="k">Accuracy</div><div id="accuracy" class="v">100%</div>
+      </div>
+      <div class="card">
+        <div class="k">Mistakes</div><div id="mistakes" class="v">0</div>
+      </div>
     </section>
 
-    <section class="text-wrap">
+    <section class="typing">
       <p id="targetText" class="target" aria-label="Text to type"></p>
-    </section>
-
-    <section class="editor-wrap">
       <label for="editor" class="visually-hidden">Type here</label>
-      <textarea id="editor" class="editor" placeholder="Start typing when the countdown finishes…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
-      <div id="overlayCountdown" class="overlay hidden" aria-hidden="true">3</div>
+      <textarea id="editor" class="editor" placeholder="Press Start or Space to begin…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
     </section>
 
-    <p class="help">
-      Tips: <kbd>Space</kbd> Start/Pause · <kbd>N</kbd> Next sentence · <kbd>R</kbd> Reset
-    </p>
+
+    <!-- Countdown overlay -->
+    <div id="countdown" class="countdown hidden" aria-hidden="true">3</div>
+
+    <!-- Tips bar -->
+    <div class="tipsbar" aria-live="polite">
+      <span id="tipText" class="tip fade-in"></span>
+    </div>
   </main>
 
-  <footer class="container footer">
-    <small>© <span id="y"></span> TypeMaster. Built for fast, accurate typing practice.</small>
+  <footer class="shell foot">
+    <small>© <span id="y"></span> TypeMaster - by <KBD>UJJWOL</KBD></small>
   </footer>
 
-  <script src="app.js" defer></script>
+  <script src="script.js" defer></script>
 </body>
 </html>
